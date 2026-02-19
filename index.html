@@ -1,1 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESP32 Control Panel</title>
+    <style>
+        body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #f0f2f5; }
+        .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
+        button { padding: 15px 30px; font-size: 18px; margin: 10px; cursor: pointer; border: none; border-radius: 8px; transition: 0.3s; }
+        .btn-on { background-color: #4CAF50; color: white; }
+        .btn-off { background-color: #f44336; color: white; }
+        button:hover { opacity: 0.8; transform: scale(1.05); }
+    </style>
+</head>
+<body>
 
+<div class="card">
+    <h2>LED Remote Control</h2>
+    <p>Status: <span id="current-status">Loading...</span></p>
+    <button class="btn-on" onclick="sendData('ON')">Turn ON</button>
+    <button class="btn-off" onclick="sendData('OFF')">Turn OFF</button>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+    // Your provided credentials
+    const firebaseConfig = {
+        apiKey: "AIzaSyBAiWny3IYTjgOu29XWjmx69E459mdaKKM",
+        authDomain: "quanta-with-shanky.firebaseapp.com",
+        databaseURL: "https://quanta-with-shanky-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "quanta-with-shanky",
+        storageBucket: "quanta-with-shanky.firebasestorage.app",
+        messagingSenderId: "1014166766764",
+        appId: "1:1014166766764:web:637bee5815f15ff7184b09"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const ledRef = ref(db, 'LED_STATUS');
+
+    // Function to update Firebase
+    window.sendData = (state) => {
+        set(ledRef, state);
+    };
+
+    // Listen for changes (to update the UI)
+    onValue(ledRef, (snapshot) => {
+        const data = snapshot.val();
+        document.getElementById('current-status').innerText = data || "OFF";
+    });
+</script>
+</body>
+</html>
